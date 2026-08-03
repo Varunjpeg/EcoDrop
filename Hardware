@@ -1,0 +1,157 @@
+                 EcoDrop Machine
+                        │
+ ┌──────────────────────┼────────────────────────┐
+ │                      │                        │
+ Input Unit        AI Processing Unit      Sorting Unit
+ │                      │                        │
+ User Door         Camera + Raspberry Pi    Servo Motors
+ │                      │                        │
+ Sensors           ESP32 Controller        Waste Bins
+
+
+
+
+
+1. User scans QR using EcoDrop App
+            ↓
+2. ESP32 receives authentication from the app
+            ↓
+3. ESP32 unlocks the intake door
+            ↓
+4. User places the waste item
+            ↓
+5. Door closes automatically
+            ↓
+6. IR sensor confirms an object is present
+            ↓
+7. Load cell measures the weight
+            ↓
+8. Raspberry Pi camera captures the image
+            ↓
+9. Raspberry Pi runs the AI model
+            ↓
+10. AI identifies:
+      • Waste category
+      • Item type
+      • Confidence score
+            ↓
+11. Raspberry Pi estimates the reward
+      (based on waste type, weight, and valuation rules)
+            ↓
+12. Raspberry Pi sends the result to the ESP32
+            ↓
+13. ESP32 displays:
+      • Item name
+      • Weight
+      • Estimated EcoCoins
+      • Accept / Reject prompt
+            ↓
+14. User accepts through the mobile app
+            ↓
+15. ESP32 rotates the sorting mechanism
+            ↓
+16. Waste drops into the correct bin
+            ↓
+17. ESP32 updates Firebase
+            ↓
+18. EcoCoins are credited to the user's account
+
+
+
+
+| Raspberry Pi Camera                        | USB Webcam                |
+| ------------------------------------------ | ------------------------- |
+| Designed for Raspberry Pi                  | General-purpose device    |
+| CSI interface (high bandwidth)             | USB interface             |
+| Lower latency                              | Slightly higher latency   |
+| Better image quality for embedded projects | Varies by model           |
+| Compact and easy to mount                  | Bulkier                   |
+| Uses dedicated camera libraries            | Plug-and-play convenience |
+
+
+
+
+
+Module 1 – User Interface
+
+This is what the user interacts with.
+
+Components
+10–15 inch Touch Display (or a normal HDMI monitor + touchscreen)
+QR Code sticker (or QR display)
+Status LEDs
+Speaker/Buzzer
+Purpose
+Show welcome screen
+Display QR code
+Show detected waste
+Show coins
+Show "Accepted" or "Rejected"
+
+
+Module 2 – Authentication
+
+The machine itself doesn't need to authenticate.
+
+The app scans the QR.
+
+ESP32 receives
+
+User ID
+Machine ID
+Authentication Success
+
+Then
+
+ESP32 unlocks the intake door.
+
+Module 3 – Intake Door
+
+This is one of the most important parts.
+
+Components
+Servo Motor (MG996R) or DC Gear Motor
+Door Lock/Latch
+Limit Switches (Door Open/Closed detection)
+Flow
+User presses Start
+
+↓
+
+Door unlocks
+
+↓
+
+Door opens
+
+↓
+
+User inserts waste
+
+↓
+
+Door closes automatically
+
+
+| Raspberry Pi           | ESP32                                               |
+| ---------------------- | --------------------------------------------------- |
+| Camera control         | Door control                                        |
+| Image capture          | Servo/stepper motor control                         |
+| AI inference           | Display control                                     |
+| Waste classification   | Sensor interfacing (IR, limit switches, ultrasonic) |
+| Reward estimation      | Communication with mobile app/Firebase              |
+| Sends results to ESP32 | Sorting and coin confirmation                       |
+
+
+FINAL
+
+When the obkect is placed the raspberry pi camera will recognize it and give estimationa and send tghe data to esp32 whic =h will display it and then ush it into bin
+
+
+
+
+
+
+
+
+
