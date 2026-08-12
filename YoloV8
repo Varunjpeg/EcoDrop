@@ -1,0 +1,14 @@
+YOLOv8 stands for You Only Look Once (version 8). It is currently one of the most popular and powerful computer vision models available for object detection.
+
+To understand why it's so widely used—especially for hardware projects like your Reverse Vending Machine—it helps to break down how it works compared to older AI models.
+
+Why is it called "You Only Look Once"?
+Before YOLO was invented, older object detection AI used a "two-stage" process.
+
+The AI would scan an image and guess hundreds of different regions where an object might be.
+
+It would then run a heavy classification check on every single one of those regions to see what the object was.
+
+This was accurate, but incredibly slow. It could not process live video feeds effectively.
+
+YOLO revolutionized this by turning the whole process into a single mathematical problem. It passes the image through its neural network exactly once (hence the name). In that single pass, it divides the image into a grid and simultaneously predicts the bounding boxes, the confidence scores, and what the objects are.
