@@ -1,0 +1,39 @@
+# EcoDrop-CA — Raspberry Pi 5 Dependencies
+# ==========================================
+# STEP 1: System packages (run once on Pi):
+#   sudo apt update
+#   sudo apt install -y python3-picamera2 python3-rpi-lgpio python3-opencv \
+#                       python3-pip python3-venv bluetooth bluez libbluetooth-dev
+#
+# STEP 2: Python packages:
+#   python3 -m venv venv
+#   source venv/bin/activate
+#   pip install -r requirements.txt
+#
+# STEP 3: Enable Bluetooth on Pi:
+#   sudo systemctl enable bluetooth
+#   sudo systemctl start bluetooth
+#   sudo hciconfig hci0 up
+
+# ── Core Server ──────────────────────────────────────────────────────
+fastapi
+uvicorn[standard]
+pydantic
+python-dotenv
+
+# ── BLE GATT Peripheral ──────────────────────────────────────────────
+bless                  # Pi acts as BLE server (peripheral/advertiser)
+# bleak is NOT needed — bleak is BLE client only
+
+# ── AI / Vision ──────────────────────────────────────────────────────
+ultralytics            # YOLOv8-nano
+opencv-python-headless
+Pillow
+numpy
+
+# ── Cloud Fallback ────────────────────────────────────────────────────
+aiohttp                # Async HTTP for Gemini API calls
+
+# ── GPIO (skipped for demo, will be used for servo/LED later) ────────
+# gpiozero
+# rpi-lgpio

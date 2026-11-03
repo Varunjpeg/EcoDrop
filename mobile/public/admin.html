@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoDrop-CA Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #F5F7FA;
+      --card-bg: #FFFFFF;
+      --text-main: #111827;
+      --text-secondary: #6B7280;
+      --accent: #059669;
+      --accent-hover: #047857;
+      --border-color: #E5E7EB;
+      --table-alt: #F9FAFB;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08);
+      --font-main: 'Inter', sans-serif;
+      --font-display: 'Space Grotesk', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: var(--font-main);
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background-color: var(--card-bg);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+      z-index: 100;
+    }
+    .brand {
+      padding: 24px;
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .nav-section {
+      padding: 16px 12px 8px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.05em;
+    }
+    .nav-items {
+      list-style: none;
+      padding: 0 12px;
+    }
+    .nav-item {
+      padding: 10px 12px;
+      margin-bottom: 4px;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s;
+    }
+    .nav-item:hover {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+    }
+    .nav-item.active {
+      background-color: #ECFDF5;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .nav-icon {
+      font-size: 1.1rem;
+    }
+
+    /* Main Area */
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    /* Topbar */
+    .topbar {
+      height: 64px;
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      flex-shrink: 0;
+    }
+    .page-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .clock {
+      font-variant-numeric: tabular-nums;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .mobile-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-main);
+    }
+
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      padding: 32px;
+      overflow-y: auto;
+    }
+    
+    .page { display: none; }
+    .page.active { display: block; animation: fadeIn 0.3s ease; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards */
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      border: 1px solid var(--border-color);
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Dashboard Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-main);
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-trend {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 12px;
+      display: inline-block;
+      width: fit-content;
+    }
+    .trend-up { background-color: #DEF7EC; color: #03543F; }
+    
+    .dash-main-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    /* Buttons & Inputs */
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+    .btn-primary {
+      background-color: var(--accent);
+      color: white;
+    }
+    .btn-primary:hover { background-color: var(--accent-hover); }
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+    .btn-outline:hover { background-color: var(--bg-color); }
+    .btn-danger {
+      background-color: #FEE2E2;
+      color: #991B1B;
+    }
+    .btn-danger:hover { background-color: #FECACA; }
+    
+    .input-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .input {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.875rem;
+      outline: none;
+    }
+    .input:focus { border-color: var(--accent); }
+
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th {
+      padding: 12px 16px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-bottom: 2px solid var(--border-color);
+      background-color: var(--card-bg);
+    }
+    td {
+      padding: 16px;
+      font-size: 0.875rem;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
+    }
+    tr:nth-child(even) {
+      background-color: var(--table-alt);
+    }
+    tr:hover { background-color: #F3F4F6; }
+    
+    .avatar-name {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: #E5E7EB;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+    }
+    
+    .badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .badge-blue { background-color: #E1EFFE; color: #1E429F; }
+    .badge-green { background-color: #DEF7EC; color: #03543F; }
+    .badge-yellow { background-color: #FDF6B2; color: #723B13; }
+    .badge-red { background-color: #FDE8E8; color: #9B1C1C; }
+    .badge-gray { background-color: #E5E7EB; color: #374151; }
+
+    /* Grids for Cards (Machines/Rewards) */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    .item-card {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .item-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .item-title { font-weight: 600; font-size: 1.1rem; margin-bottom: 4px; }
+    .item-subtitle { color: var(--text-secondary); font-size: 0.875rem; }
+    .progress-bar-bg {
+      height: 8px;
+      background-color: var(--border-color);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background-color: var(--accent);
+    }
+    
+    /* Charts Placeholder (CSS only bar chart) */
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      height: 200px;
+      gap: 16px;
+      padding-top: 20px;
+    }
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      height: 100%;
+    }
+    .bar {
+      width: 100%;
+      background-color: var(--accent);
+      border-radius: 4px 4px 0 0;
+      transition: height 1s ease;
+      min-height: 10px;
+    }
+    .bar-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    /* Donut */
+    .donut-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+      position: relative;
+    }
+    .donut-legend {
+      margin-top: 16px;
+      font-size: 0.875rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 8px; }
+    .legend-color { width: 12px; height: 12px; border-radius: 2px; }
+
+    /* Forum */
+    .forum-post {
+      padding: 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: flex;
+      gap: 16px;
+    }
+    .forum-post.flagged {
+      border-color: #FCA5A5;
+      background-color: #FEF2F2;
+    }
+    .forum-content { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .forum-title { font-weight: 600; }
+    .forum-meta { font-size: 0.875rem; color: var(--text-secondary); display: flex; gap: 16px; align-items: center; }
+    
+    /* Settings */
+    .settings-group {
+      margin-bottom: 32px;
+    }
+    .settings-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .settings-label h4 { font-weight: 500; margin-bottom: 4px; }
+    .settings-label p { font-size: 0.875rem; color: var(--text-secondary); }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .sidebar {
+        position: fixed;
+        left: -240px;
+        height: 100vh;
+      }
+      .sidebar.open {
+        transform: translateX(240px);
+      }
+      .mobile-toggle { display: block; }
+      .dash-main-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">EcoDrop-CA</div>
+    <div style="flex: 1; overflow-y: auto;">
+      <div class="nav-section">Overview</div>
+      <ul class="nav-items">
+        <li class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span> Dashboard</li>
+        <li class="nav-item" data-page="transactions"><span class="nav-icon">💸</span> Transactions</li>
+        <li class="nav-item" data-page="machines"><span class="nav-icon">♻️</span> Machines</li>
+      </ul>
+      <div class="nav-section">Users</div>
+      <ul class="nav-items">
+        <li class="nav-item" data-page="users"><span class="nav-icon">👥</span> All Users</li>
+        <li class="nav-item" data-page="leaderboard"><span class="nav-icon">🏆</span> Leaderboard</li>
+      </ul>
+      <div class="nav-section">Rewards</div>
+      <ul class="nav-items">
+        <li class="nav-item" data-page="rewards"><span class="nav-icon">🎁</span> Catalog</li>
+        <li class="nav-item" data-page="vouchers"><span class="nav-icon">🎟️</span> Vouchers</li>
+      </ul>
+      <div class="nav-section">Content</div>
+      <ul class="nav-items">
+        <li class="nav-item" data-page="forums"><span class="nav-icon">💬</span> Forums</li>
+        <li class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span> Settings</li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Main Area -->
+  <main class="main-area">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <button class="mobile-toggle" id="mobile-toggle">☰</button>
+        <h1 class="page-title" id="page-title">Dashboard</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="clock" id="live-clock">00:00:00</div>
+        <div class="avatar" style="width: 40px; height: 40px; background: var(--accent); color: white;">AD</div>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <div class="content-area">
+      
+      <!-- 1. DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="stats-grid">
+          <div class="card stat-card">
+            <div class="stat-header"><span>Total Items Recycled</span> <span>♻️</span></div>
+            <div class="stat-value" data-value="4320">0</div>
+            <div class="stat-trend trend-up">+18% this month</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-header"><span>Registered Users</span> <span>👥</span></div>
+            <div class="stat-value" data-value="15">0</div>
+            <div class="stat-trend trend-up">+3 new</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-header"><span>E-Coins Issued</span> <span>🪙</span></div>
+            <div class="stat-value" data-value="28500">0</div>
+            <div class="stat-trend trend-up">+5.2k this week</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-header"><span>CO₂ Saved (kg)</span> <span>🌱</span></div>
+            <div class="stat-value" data-value="151.2" data-float="true">0.0</div>
+            <div class="stat-trend trend-up">+12% vs last month</div>
+          </div>
+        </div>
+
+        <div class="dash-main-grid">
+          <div class="card">
+            <h3 class="card-title">Recycling Volume (Last 7 Months)</h3>
+            <div class="bar-chart">
+              <div class="bar-col"><div class="bar" style="height: 30%"></div><span class="bar-label">Mar</span></div>
+              <div class="bar-col"><div class="bar" style="height: 45%"></div><span class="bar-label">Apr</span></div>
+              <div class="bar-col"><div class="bar" style="height: 40%"></div><span class="bar-label">May</span></div>
+              <div class="bar-col"><div class="bar" style="height: 60%"></div><span class="bar-label">Jun</span></div>
+              <div class="bar-col"><div class="bar" style="height: 55%"></div><span class="bar-label">Jul</span></div>
+              <div class="bar-col"><div class="bar" style="height: 80%"></div><span class="bar-label">Aug</span></div>
+              <div class="bar-col"><div class="bar" style="height: 90%"></div><span class="bar-label">Sep</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 class="card-title">Waste Breakdown</h3>
+            <div class="donut-container">
+              <svg width="160" height="160" viewBox="0 0 32 32">
+                <!-- SVG Donut Chart representation -->
+                <circle r="16" cx="16" cy="16" fill="transparent" stroke="#E5E7EB" stroke-width="6" />
+                <circle r="16" cx="16" cy="16" fill="transparent" stroke="#059669" stroke-width="6" stroke-dasharray="38 100" />
+                <circle r="16" cx="16" cy="16" fill="transparent" stroke="#3B82F6" stroke-width="6" stroke-dasharray="22 100" stroke-dashoffset="-38" />
+                <circle r="16" cx="16" cy="16" fill="transparent" stroke="#F59E0B" stroke-width="6" stroke-dasharray="18 100" stroke-dashoffset="-60" />
+                <circle r="16" cx="16" cy="16" fill="transparent" stroke="#8B5CF6" stroke-width="6" stroke-dasharray="14 100" stroke-dashoffset="-78" />
+                <circle r="16" cx="16" cy="16" fill="transparent" stroke="#EF4444" stroke-width="6" stroke-dasharray="8 100" stroke-dashoffset="-92" />
+              </svg>
+            </div>
+            <div class="donut-legend">
+              <div class="legend-item"><div class="legend-color" style="background:#059669"></div> Plastic 38%</div>
+              <div class="legend-item"><div class="legend-color" style="background:#3B82F6"></div> Paper 22%</div>
+              <div class="legend-item"><div class="legend-color" style="background:#F59E0B"></div> Cardboard 18%</div>
+              <div class="legend-item"><div class="legend-color" style="background:#8B5CF6"></div> Stationery 14%</div>
+              <div class="legend-item"><div class="legend-color" style="background:#EF4444"></div> E-Waste 8%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-main-grid">
+          <div class="card" style="grid-column: span 1;">
+            <h3 class="card-title">Machine Status</h3>
+            <div id="dash-machines-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
+          </div>
+          <div class="card" style="grid-column: span 1;">
+            <h3 class="card-title">Recent Transactions</h3>
+            <div id="dash-transactions-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. TRANSACTIONS -->
+      <div class="page" id="page-transactions">
+        <div class="card">
+          <div class="card-title">
+            <span>Transaction History</span>
+            <button class="btn btn-outline" onclick="exportTransactionsCSV()">📥 Export CSV</button>
+          </div>
+          <div class="input-group">
+            <input type="text" class="input" placeholder="Search User or ID..." style="flex: 1;" id="tx-search">
+            <select class="input" id="tx-type">
+              <option value="All">All Types</option>
+              <option value="Earned">Earned</option>
+              <option value="Spent">Spent</option>
+            </select>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>User</th>
+                  <th>Item / Detail</th>
+                  <th>Condition</th>
+                  <th>Machine/Partner</th>
+                  <th>Coins</th>
+                  <th>Type</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="transactions-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. MACHINES -->
+      <div class="page" id="page-machines">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 20px; gap: 12px;">
+          <button class="btn btn-outline">🔄 Refresh</button>
+          <button class="btn btn-primary">➕ Add Machine</button>
+        </div>
+        <div class="card-grid" id="machines-grid"></div>
+      </div>
+
+      <!-- 4. USERS -->
+      <div class="page" id="page-users">
+        <div class="card">
+          <div class="input-group">
+            <input type="text" class="input" placeholder="Search by name or email..." style="flex: 1;">
+            <select class="input">
+              <option value="All">All Departments</option>
+              <option value="CSE">CSE</option>
+              <option value="ECE">ECE</option>
+              <option value="ME">ME</option>
+              <option value="CE">CE</option>
+              <option value="EE">EE</option>
+            </select>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Department</th>
+                  <th>Coins Balance</th>
+                  <th>Items Deposited</th>
+                  <th>Streak</th>
+                  <th>Joined</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. LEADERBOARD -->
+      <div class="page" id="page-leaderboard">
+        <div class="card">
+          <h3 class="card-title">All-Time Leaderboard</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>User</th>
+                  <th>Dept</th>
+                  <th>Items</th>
+                  <th>Coins Earned</th>
+                  <th>CO₂ Saved (kg)</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboard-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. REWARDS -->
+      <div class="page" id="page-rewards">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+          <button class="btn btn-primary">➕ Add Reward</button>
+        </div>
+        <div class="card-grid" id="rewards-grid"></div>
+      </div>
+
+      <!-- 7. VOUCHERS -->
+      <div class="page" id="page-vouchers">
+        <div class="card">
+          <div class="input-group">
+            <select class="input">
+              <option value="All">All Statuses</option>
+              <option value="Active">Active</option>
+              <option value="Used">Used</option>
+              <option value="Expired">Expired</option>
+            </select>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>User</th>
+                  <th>Partner</th>
+                  <th>Reward Desc</th>
+                  <th>Coins</th>
+                  <th>Expiry</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="vouchers-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. FORUMS -->
+      <div class="page" id="page-forums">
+        <div class="card">
+          <h3 class="card-title">Community Discussions</h3>
+          <div id="forums-list"></div>
+        </div>
+      </div>
+
+      <!-- 9. SETTINGS -->
+      <div class="page" id="page-settings">
+        <div class="card">
+          <div class="settings-group">
+            <h3 class="card-title">System Configuration</h3>
+            <div class="settings-row">
+              <div class="settings-label">
+                <h4>AI Confidence Threshold</h4>
+                <p>Minimum confidence for auto-classification</p>
+              </div>
+              <div><input type="text" class="input" value="85%" style="width:80px; text-align:center;"></div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-label">
+                <h4>Local AI Model</h4>
+                <p>Model used on edge device</p>
+              </div>
+              <div><input type="text" class="input" value="YOLOv8-nano" disabled></div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-label">
+                <h4>Cloud AI Model</h4>
+                <p>Fallback for complex classifications</p>
+              </div>
+              <div><input type="text" class="input" value="Gemini 1.5 Flash" disabled></div>
+            </div>
+          </div>
+          
+          <div class="settings-group">
+            <h3 class="card-title">Coin Valuation Rules (Multiplier)</h3>
+            <div class="settings-row">
+              <div class="settings-label"><h4>Condition: Excellent</h4></div>
+              <div><input type="text" class="input" value="1.00" style="width:80px;"></div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-label"><h4>Condition: Good</h4></div>
+              <div><input type="text" class="input" value="0.85" style="width:80px;"></div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-label"><h4>Condition: Fair</h4></div>
+              <div><input type="text" class="input" value="0.65" style="width:80px;"></div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-label"><h4>Condition: Poor</h4></div>
+              <div><input type="text" class="input" value="0.40" style="width:80px;"></div>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3 class="card-title">System Actions</h3>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <button class="btn btn-primary" onclick="exportTransactionsCSV()">📥 Export All Data (CSV)</button>
+              <button class="btn btn-outline">🔔 Send Test Notification</button>
+              <button class="btn btn-outline">🔄 Reset Weekly Leaderboard</button>
+              <button class="btn btn-danger">⚠️ Toggle System Maintenance</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // --- UTILS ---
+    function formatNum(n) { return new Intl.NumberFormat().format(n); }
+    function getBadgeClass(status) {
+      if(status==='Active' || status==='Earned' || status==='Excellent') return 'badge-green';
+      if(status==='Maintenance' || status==='Fair') return 'badge-yellow';
+      if(status==='Offline' || status==='Spent' || status==='Poor' || status==='Expired') return 'badge-red';
+      if(status==='Good' || status==='Used') return 'badge-blue';
+      return 'badge-gray';
+    }
+
+    // --- MOCK DATA ---
+    const users = [
+      { id: 1, name: 'Aarav Sharma', email: 'aarav@uni.edu', dept: 'CSE', year: 3, coins: 2450, items: 120, streak: 5, joined: '2023-08-12' },
+      { id: 2, name: 'Diya Patel', email: 'diya@uni.edu', dept: 'ECE', year: 2, coins: 1800, items: 85, streak: 2, joined: '2023-09-01' },
+      { id: 3, name: 'Vihaan Singh', email: 'vihaan@uni.edu', dept: 'ME', year: 4, coins: 3100, items: 155, streak: 12, joined: '2023-08-10' },
+      { id: 4, name: 'Ananya Gupta', email: 'ananya@uni.edu', dept: 'CE', year: 1, coins: 950, items: 40, streak: 1, joined: '2024-01-15' },
+      { id: 5, name: 'Kabir Reddy', email: 'kabir@uni.edu', dept: 'EE', year: 3, coins: 2100, items: 102, streak: 8, joined: '2023-08-20' },
+      { id: 6, name: 'Ishaan Verma', email: 'ishaan@uni.edu', dept: 'CSE', year: 2, coins: 1200, items: 58, streak: 3, joined: '2023-11-05' },
+      { id: 7, name: 'Mira Desai', email: 'mira@uni.edu', dept: 'ECE', year: 4, coins: 4500, items: 210, streak: 15, joined: '2023-08-01' },
+      { id: 8, name: 'Arjun Nair', email: 'arjun@uni.edu', dept: 'ME', year: 1, coins: 400, items: 18, streak: 0, joined: '2024-02-10' },
+      { id: 9, name: 'Zara Khan', email: 'zara@uni.edu', dept: 'EE', year: 2, coins: 1650, items: 78, streak: 4, joined: '2023-10-12' },
+      { id: 10, name: 'Rohan Mehta', email: 'rohan@uni.edu', dept: 'CSE', year: 3, coins: 2900, items: 140, streak: 9, joined: '2023-08-18' },
+      { id: 11, name: 'Priya Joshi', email: 'priya@uni.edu', dept: 'CE', year: 4, coins: 3800, items: 190, streak: 11, joined: '2023-08-05' },
+      { id: 12, name: 'Aditya Rao', email: 'aditya@uni.edu', dept: 'ECE', year: 1, coins: 600, items: 25, streak: 2, joined: '2024-01-20' },
+      { id: 13, name: 'Kavya Pillai', email: 'kavya@uni.edu', dept: 'EE', year: 3, coins: 1950, items: 92, streak: 6, joined: '2023-09-15' },
+      { id: 14, name: 'Shaurya Das', email: 'shaurya@uni.edu', dept: 'ME', year: 2, coins: 1400, items: 65, streak: 3, joined: '2023-11-25' },
+      { id: 15, name: 'Navya Iyer', email: 'navya@uni.edu', dept: 'CSE', year: 4, coins: 4100, items: 205, streak: 14, joined: '2023-08-02' }
+    ];
+
+    const machines = [
+      { id: 'M-001', name: 'Library Hub', location: 'Central Library, Ground Floor', status: 'Active', items: 1240, uptime: '99.8%', lastSync: '2 mins ago' },
+      { id: 'M-002', name: 'Hostel Block A', location: 'Block A Common Room', status: 'Active', items: 850, uptime: '98.5%', lastSync: '5 mins ago' },
+      { id: 'M-003', name: 'Cafeteria Drop', location: 'Main Cafeteria', status: 'Maintenance', items: 2100, uptime: '85.0%', lastSync: '1 hour ago' },
+      { id: 'M-004', name: 'Sports Complex', location: 'Gymkhana Entrance', status: 'Active', items: 450, uptime: '99.9%', lastSync: '1 min ago' },
+      { id: 'M-005', name: 'Academic Block 3', location: 'AB3 Foyer', status: 'Offline', items: 920, uptime: '92.4%', lastSync: '12 hours ago' }
+    ];
+
+    const itemTypes = [
+      { name: 'Plastic Bottle', emoji: '🚰', baseCoins: 10 },
+      { name: 'Paper/Book', emoji: '📚', baseCoins: 15 },
+      { name: 'Cardboard', emoji: '📦', baseCoins: 20 },
+      { name: 'Stationery', emoji: '🖊️', baseCoins: 5 },
+      { name: 'E-Waste (Phone)', emoji: '📱', baseCoins: 100 }
+    ];
+    const conditions = ['Excellent', 'Good', 'Fair', 'Poor'];
+
+    // Generate ~500 transactions
+    const transactions = [];
+    let txId = 10001;
+    for(let i = 0; i < 500; i++) {
+      const isSpend = Math.random() > 0.8;
+      const u = users[Math.floor(Math.random() * users.length)];
+      
+      let itemDetail, cond, mName, type, coins;
+      if(isSpend) {
+        type = 'Spent';
+        itemDetail = 'Reward Redemption';
+        cond = 'N/A';
+        mName = 'Partner Store';
+        coins = - (Math.floor(Math.random() * 5 + 1) * 100);
+      } else {
+        type = 'Earned';
+        const it = itemTypes[Math.floor(Math.random() * itemTypes.length)];
+        itemDetail = it.emoji + ' ' + it.name;
+        cond = conditions[Math.floor(Math.random() * conditions.length)];
+        mName = machines[Math.floor(Math.random() * machines.length)].name;
+        
+        let mult = 1.0;
+        if(cond==='Good') mult=0.85; else if(cond==='Fair') mult=0.65; else if(cond==='Poor') mult=0.4;
+        coins = Math.floor(it.baseCoins * mult);
+      }
+      
+      // Random date in past 30 days
+      const date = new Date(Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000));
+      
+      transactions.push({
+        id: 'TXN-' + (txId++),
+        user: u,
+        item: itemDetail,
+        condition: cond,
+        machine: mName,
+        coins: coins,
+        type: type,
+        date: date.toISOString().split('T')[0]
+      });
+    }
+    // Sort descending by date
+    transactions.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+    const rewards = [
+      { partner: 'Gazebo', icon: '🍔', desc: 'Free Burger Meal', cost: 1000, redeemed: 145, total: 200 },
+      { partner: 'North Square', icon: '☕', desc: 'Any Medium Coffee', cost: 400, redeemed: 85, total: 100 },
+      { partner: 'Hunger', icon: '🍕', desc: '10% Off Pizza', cost: 300, redeemed: 450, total: 500 },
+      { partner: 'Gymkhana', icon: '🏸', desc: '1 Hr Badminton Court', cost: 800, redeemed: 24, total: 50 },
+      { partner: 'AB3 Canteen', icon: '🍛', desc: 'Free Thali', cost: 1200, redeemed: 12, total: 20 },
+      { partner: 'Library', icon: '📚', desc: 'Late Fee Waiver (1 week)', cost: 500, redeemed: 89, total: 0 }, // 0 means unlimited
+      { partner: 'Uni Store', icon: '👕', desc: 'University Hoodie 50% Off', cost: 2500, redeemed: 5, total: 10 }
+    ];
+
+    const vouchers = [
+      { code: 'GZB-A9F2', user: 'Vihaan Singh', partner: 'Gazebo', desc: 'Free Burger Meal', coins: 1000, expiry: '2024-10-15', status: 'Active' },
+      { code: 'NSQ-B8X1', user: 'Diya Patel', partner: 'North Square', desc: 'Medium Coffee', coins: 400, expiry: '2024-09-01', status: 'Used' },
+      { code: 'HGR-C7M3', user: 'Aarav Sharma', partner: 'Hunger', desc: '10% Off Pizza', coins: 300, expiry: '2024-08-20', status: 'Expired' },
+      { code: 'GYM-D6P4', user: 'Mira Desai', partner: 'Gymkhana', desc: '1 Hr Badminton', coins: 800, expiry: '2024-11-01', status: 'Active' },
+      { code: 'AB3-E5L5', user: 'Kabir Reddy', partner: 'AB3 Canteen', desc: 'Free Thali', coins: 1200, expiry: '2024-10-10', status: 'Active' },
+      { code: 'LIB-F4K6', user: 'Ishaan Verma', partner: 'Library', desc: 'Fee Waiver', coins: 500, expiry: '2024-09-10', status: 'Used' },
+      { code: 'UNI-G3J7', user: 'Navya Iyer', partner: 'Uni Store', desc: 'Hoodie 50% Off', coins: 2500, expiry: '2024-12-31', status: 'Active' },
+      { code: 'GZB-H2I8', user: 'Rohan Mehta', partner: 'Gazebo', desc: 'Free Burger Meal', coins: 1000, expiry: '2024-08-01', status: 'Expired' }
+    ];
+
+    const forums = [
+      { author: 'Aarav Sharma', avatar: 'AS', topic: 'Feature Request', title: 'Add machine near South Hostel?', likes: 24, comments: 5, time: '2h ago', flagged: false },
+      { author: 'Mira Desai', avatar: 'MD', topic: 'General', title: 'I finally reached #1 on the leaderboard!', likes: 56, comments: 12, time: '5h ago', flagged: false },
+      { author: 'Unknown User', avatar: '?', topic: 'Spam', title: 'Get free coins click here!! http://scam.site', likes: 0, comments: 0, time: '1d ago', flagged: true },
+      { author: 'Kabir Reddy', avatar: 'KR', topic: 'Bug', title: 'Machine M-003 rejected my clean plastic bottles', likes: 12, comments: 8, time: '1d ago', flagged: false },
+      { author: 'System Admin', avatar: 'SA', topic: 'Announcement', title: 'New reward partner added: Uni Store!', likes: 105, comments: 15, time: '3d ago', flagged: false }
+    ];
+
+    // --- DOM RENDERING ---
+    function render() {
+      // Dash Machines
+      document.getElementById('dash-machines-list').innerHTML = machines.map(m => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px;">
+          <div><div style="font-weight:500;">${m.name}</div><div style="font-size:0.75rem; color:var(--text-secondary)">${m.location}</div></div>
+          <span class="badge ${getBadgeClass(m.status)}">${m.status}</span>
+        </div>
+      `).join('');
+
+      // Dash Transactions (first 6)
+      document.getElementById('dash-transactions-list').innerHTML = transactions.slice(0,6).map(t => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px;">
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div class="avatar" style="background:#E5E7EB; color:#374151;">${t.user.name.substring(0,2).toUpperCase()}</div>
+            <div><div style="font-weight:500; font-size:0.875rem">${t.item}</div><div style="font-size:0.75rem; color:var(--text-secondary)">${t.date}</div></div>
+          </div>
+          <div style="font-weight:600; color: ${t.coins > 0 ? 'var(--accent)' : '#EF4444'}">${t.coins > 0 ? '+'+t.coins : t.coins}</div>
+        </div>
+      `).join('');
+
+      // Transactions Table
+      document.getElementById('transactions-tbody').innerHTML = transactions.slice(0,50).map(t => `
+        <tr>
+          <td style="font-family:monospace; font-size:0.75rem">${t.id}</td>
+          <td><div class="avatar-name"><div class="avatar">${t.user.name.substring(0,2).toUpperCase()}</div> ${t.user.name}</div></td>
+          <td>${t.item}</td>
+          <td>${t.condition !== 'N/A' ? `<span class="badge ${getBadgeClass(t.condition)}">${t.condition}</span>` : '-'}</td>
+          <td>${t.machine}</td>
+          <td style="font-weight:600; color: ${t.coins > 0 ? 'var(--accent)' : '#EF4444'}">${t.coins > 0 ? '+'+t.coins : t.coins}</td>
+          <td><span class="badge ${getBadgeClass(t.type)}">${t.type}</span></td>
+          <td>${t.date}</td>
+        </tr>
+      `).join('');
+
+      // Machines Grid
+      document.getElementById('machines-grid').innerHTML = machines.map(m => `
+        <div class="card item-card">
+          <div class="item-card-header">
+            <div>
+              <div class="item-title">${m.name}</div>
+              <div class="item-subtitle">${m.location}</div>
+            </div>
+            <span class="badge ${getBadgeClass(m.status)}">${m.status}</span>
+          </div>
+          <div style="font-size:0.875rem; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+            <div style="display:flex; justify-content:space-between;"><span>Items Collected:</span> <strong>${formatNum(m.items)}</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span>Uptime:</span> <strong>${m.uptime}</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span>Last Sync:</span> <strong>${m.lastSync}</strong></div>
+          </div>
+        </div>
+      `).join('');
+
+      // Users Table
+      document.getElementById('users-tbody').innerHTML = users.map(u => `
+        <tr>
+          <td><div class="avatar-name"><div class="avatar">${u.name.substring(0,2).toUpperCase()}</div>
+              <div><div style="font-weight:500">${u.name}</div><div style="font-size:0.75rem; color:var(--text-secondary)">${u.email}</div></div>
+          </div></td>
+          <td>${u.dept} (Yr ${u.year})</td>
+          <td style="font-weight:600">${formatNum(u.coins)}</td>
+          <td>${formatNum(u.items)}</td>
+          <td>${u.streak} 🔥</td>
+          <td>${u.joined}</td>
+          <td>
+            <button class="btn btn-outline" style="padding:4px 8px; font-size:0.75rem">View</button>
+          </td>
+        </tr>
+      `).join('');
+
+      // Leaderboard
+      const sortedUsers = [...users].sort((a,b) => b.coins - a.coins);
+      document.getElementById('leaderboard-tbody').innerHTML = sortedUsers.map((u, i) => {
+        let rankStr = i + 1;
+        if(i===0) rankStr = '🥇 1'; else if(i===1) rankStr = '🥈 2'; else if(i===2) rankStr = '🥉 3';
+        const co2 = (u.items * 0.035).toFixed(1); // Mock calculation
+        return `
+        <tr>
+          <td style="font-weight:700; font-size:1.1rem">${rankStr}</td>
+          <td><div class="avatar-name"><div class="avatar" style="${i<3 ? 'background:var(--accent); color:white' : ''}">${u.name.substring(0,2).toUpperCase()}</div> ${u.name}</div></td>
+          <td>${u.dept}</td>
+          <td>${formatNum(u.items)}</td>
+          <td style="font-weight:600; color:var(--accent)">${formatNum(u.coins)}</td>
+          <td>${co2}</td>
+        </tr>
+      `}).join('');
+
+      // Rewards Grid
+      document.getElementById('rewards-grid').innerHTML = rewards.map(r => {
+        const pct = r.total === 0 ? 0 : (r.redeemed / r.total) * 100;
+        return `
+        <div class="card item-card">
+          <div class="item-card-header">
+            <div style="display:flex; gap:12px; align-items:center;">
+              <div style="font-size:2rem">${r.icon}</div>
+              <div>
+                <div class="item-title">${r.partner}</div>
+                <div class="item-subtitle" style="color:var(--accent); font-weight:600;">${r.cost} Coins</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:8px;">
+            <div style="font-size:0.875rem; margin-bottom:12px;">${r.desc}</div>
+            <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-secondary);">
+              <span>Redeemed: ${r.redeemed} ${r.total > 0 ? '/ '+r.total : ''}</span>
+              ${r.total > 0 ? `<span>${pct.toFixed(0)}%</span>` : '<span>Unlimited</span>'}
+            </div>
+            ${r.total > 0 ? `
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: ${pct}%"></div>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `}).join('');
+
+      // Vouchers Table
+      document.getElementById('vouchers-tbody').innerHTML = vouchers.map(v => `
+        <tr>
+          <td style="font-family:monospace; font-weight:600; letter-spacing:1px;">${v.code}</td>
+          <td>${v.user}</td>
+          <td>${v.partner}</td>
+          <td>${v.desc}</td>
+          <td>${v.coins}</td>
+          <td>${v.expiry}</td>
+          <td><span class="badge ${getBadgeClass(v.status)}">${v.status}</span></td>
+        </tr>
+      `).join('');
+
+      // Forums
+      document.getElementById('forums-list').innerHTML = forums.map(f => `
+        <div class="forum-post ${f.flagged ? 'flagged' : ''}">
+          <div class="avatar">${f.avatar}</div>
+          <div class="forum-content">
+            <div style="display:flex; justify-content:space-between;">
+              <span class="badge badge-gray">${f.topic}</span>
+              <span style="font-size:0.75rem; color:var(--text-secondary)">${f.time}</span>
+            </div>
+            <div class="forum-title">${f.title}</div>
+            <div class="forum-meta">
+              <span>👤 ${f.author}</span>
+              <span>❤️ ${f.likes}</span>
+              <span>💬 ${f.comments}</span>
+              ${f.flagged ? '<span style="color:#DC2626; font-weight:600">⚠️ Flagged Spam</span>' : ''}
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            ${f.flagged ? '<button class="btn btn-danger" style="padding:4px 8px; font-size:0.75rem;">Delete</button>' : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- INTERACTIONS ---
+    
+    // Navigation
+    const navItems = document.querySelectorAll('.nav-item');
+    const pages = document.querySelectorAll('.page');
+    const pageTitle = document.getElementById('page-title');
+    const sidebar = document.getElementById('sidebar');
+
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        navItems.forEach(n => n.classList.remove('active'));
+        item.classList.add('active');
+        
+        const target = item.getAttribute('data-page');
+        pages.forEach(p => p.classList.remove('active'));
+        document.getElementById('page-' + target).classList.add('active');
+        
+        pageTitle.textContent = item.textContent.replace(/[^\w\s-]/g, '').trim(); // Remove emoji
+        
+        // Mobile close sidebar
+        if(window.innerWidth <= 900) {
+          sidebar.classList.remove('open');
+        }
+
+        // Re-trigger animation if dashboard
+        if(target === 'dashboard') animateNumbers();
+      });
+    });
+
+    // Mobile Toggle
+    document.getElementById('mobile-toggle').addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+    });
+
+    // Clock
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('live-clock').textContent = now.toLocaleTimeString('en-US', {hour12: false});
+    }, 1000);
+
+    // Number Animation
+    function animateNumbers() {
+      const vals = document.querySelectorAll('.stat-value');
+      vals.forEach(val => {
+        const target = parseFloat(val.getAttribute('data-value'));
+        const isFloat = val.getAttribute('data-float') === 'true';
+        const duration = 1000; // ms
+        const steps = 30;
+        const stepTime = Math.abs(Math.floor(duration / steps));
+        let current = 0;
+        const inc = target / steps;
+        
+        const timer = setInterval(() => {
+          current += inc;
+          if (current >= target) {
+            current = target;
+            clearInterval(timer);
+          }
+          val.textContent = isFloat ? current.toFixed(1) : formatNum(Math.floor(current));
+        }, stepTime);
+      });
+    }
+
+    // CSV Export
+    window.exportTransactionsCSV = function() {
+      const headers = ['ID', 'User', 'Item', 'Condition', 'Machine', 'Coins', 'Type', 'Date'];
+      const rows = transactions.map(t => [
+        t.id, t.user.name, t.item.replace(/,/g, ''), t.condition, t.machine, t.coins, t.type, t.date
+      ]);
+      const csvContent = [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "ecodrop_transactions.csv");
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    // Init
+    render();
+    animateNumbers();
+
+  </script>
+</body>
+</html>

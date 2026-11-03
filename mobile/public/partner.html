@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Portal | EcoDrop-CA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS reset & variables */
+        :root {
+            --bg-color: #F5F7FA;
+            --card-bg: #FFFFFF;
+            --accent: #059669;
+            --accent-hover: #047857;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --font-main: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .screen {
+            display: none;
+            padding: 24px 20px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography */
+        h1, h2, h3 { font-family: var(--font-display); }
+        .text-center { text-align: center; }
+        .mb-2 { margin-bottom: 8px; }
+        .mb-4 { margin-bottom: 16px; }
+        .mb-6 { margin-bottom: 24px; }
+        .text-sm { font-size: 14px; }
+        .text-xs { font-size: 12px; }
+        .text-secondary { color: var(--text-secondary); }
+        .font-semibold { font-weight: 600; }
+        .error-text { color: #DC2626; font-size: 14px; margin-top: 8px; display: none; text-align: center; }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Forms & Buttons */
+        .form-group { margin-bottom: 16px; }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: var(--font-main);
+            font-size: 16px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #fff;
+            color: var(--text-primary);
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+        .mono-input {
+            font-family: monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 8px;
+            border: none;
+            font-family: var(--font-main);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            gap: 8px;
+        }
+        .btn-primary {
+            background-color: var(--accent);
+            color: #fff;
+        }
+        .btn-primary:hover { background-color: var(--accent-hover); }
+        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        .btn-outline:hover {
+            background-color: #F3F4F6;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .header-title { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .sign-out { font-size: 14px; color: var(--text-secondary); text-decoration: none; cursor: pointer; }
+
+        /* Vouchers */
+        .voucher-status {
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        .status-active { background-color: #DEF7EC; color: #03543F; border: 1px solid #31C48D; }
+        .status-used { background-color: #F3F4F6; color: #374151; border: 1px solid #D1D5DB; }
+        .status-expired { background-color: #FDE8E8; color: #9B1C1C; border: 1px solid #F8B4B4; }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: var(--text-secondary); font-size: 14px; }
+        .detail-value { font-weight: 500; font-size: 14px; text-align: right; }
+        .detail-value.mono { font-family: monospace; letter-spacing: 1px; }
+        
+        .test-codes {
+            margin-top: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+        .test-code {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #E5E7EB;
+            border-radius: 20px;
+            font-family: monospace;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: var(--text-primary);
+        }
+        .test-code:hover { background: #D1D5DB; }
+
+        /* Loader */
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        .loader.active { display: inline-block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Success emoji */
+        .emoji-burst {
+            font-size: 64px;
+            text-align: center;
+            margin: 24px 0;
+            animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes pop {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .icon-large {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- SCREEN 1: LOGIN -->
+    <div id="screen-login" class="screen active">
+        <div class="card" style="margin-top: 40px;">
+            <div class="icon-large">🏪</div>
+            <h1 class="text-center mb-2">Partner Portal</h1>
+            <p class="text-center text-secondary text-sm mb-6">EcoDrop-CA · Voucher Verification</p>
+            
+            <div class="form-group">
+                <label for="partner-select">Select Outlet</label>
+                <select id="partner-select">
+                    <option value="" disabled selected>Choose your outlet...</option>
+                    <option value="gazebo">🍔 Gazebo</option>
+                    <option value="northsquare">🍕 North Square</option>
+                    <option value="hunger">🥗 Hunger</option>
+                    <option value="gymkhana">🏋️ Gymkhana</option>
+                    <option value="ab3">🍱 AB3 Canteen</option>
+                    <option value="library">📚 Library</option>
+                    <option value="demo">🏪 Demo Partner</option>
+                </select>
+            </div>
+            
+            <div class="form-group mb-6">
+                <label for="password-input">Password</label>
+                <input type="password" id="password-input" placeholder="Enter password">
+            </div>
+            
+            <button id="login-btn" class="btn btn-primary mb-4">Sign In</button>
+            <p id="login-error" class="error-text">Invalid password or outlet not selected.</p>
+            
+            <div class="text-center text-xs text-secondary mt-4" style="background: #F3F4F6; padding: 12px; border-radius: 8px;">
+                Demo: Select any outlet · Password: outlet + "123"<br>(e.g. gazebo123)
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: SCANNER -->
+    <div id="screen-scanner" class="screen">
+        <div class="header">
+            <div class="header-title" id="scanner-partner-name">🏪 Partner</div>
+            <a class="sign-out" id="logout-btn">Sign out</a>
+        </div>
+        
+        <div class="card mb-6">
+            <h2 class="mb-2 text-center">Verify Voucher</h2>
+            <p class="text-secondary text-sm text-center mb-6">Ask customer to show their voucher code from the EcoDrop app.</p>
+            
+            <div class="form-group">
+                <input type="text" id="voucher-input" class="mono-input" placeholder="ENTER-CODE" maxlength="12" autocomplete="off" spellcheck="false">
+            </div>
+            
+            <button id="verify-btn" class="btn btn-primary">
+                <span class="btn-text">Verify Code</span>
+                <span class="loader" id="verify-loader"></span>
+            </button>
+        </div>
+
+        <div>
+            <h3 class="text-sm text-center text-secondary">Quick Test Codes</h3>
+            <div class="test-codes" id="test-codes-container">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: VERIFICATION RESULT -->
+    <div id="screen-result" class="screen">
+        <div class="mb-4">
+            <button id="result-back-btn" class="btn btn-outline" style="width: auto; padding: 8px 16px; font-size: 14px;">← Back</button>
+        </div>
+        
+        <div id="result-banner" class="voucher-status">
+            <!-- Injected via JS -->
+        </div>
+        
+        <div class="card mb-6">
+            <div class="text-center mb-4">
+                <div id="result-icon" style="font-size: 32px; margin-bottom: 8px;"></div>
+                <h3 id="result-partner" style="font-size: 18px;"></h3>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Reward</span>
+                <span class="detail-value font-semibold" id="result-reward"></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Customer</span>
+                <span class="detail-value" id="result-customer"></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Code</span>
+                <span class="detail-value mono" id="result-code"></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Coins Used</span>
+                <span class="detail-value" id="result-coins"></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Expires</span>
+                <span class="detail-value" id="result-expires"></span>
+            </div>
+        </div>
+        
+        <div id="action-container" style="display: none;">
+            <button id="redeem-btn" class="btn btn-primary mb-4">Mark as Used & Apply Discount</button>
+        </div>
+        <button id="scan-another-btn" class="btn btn-outline">Scan Another Voucher</button>
+    </div>
+
+    <!-- SCREEN 4: SUCCESS -->
+    <div id="screen-success" class="screen">
+        <div class="card text-center" style="margin-top: 40px; padding-bottom: 40px;">
+            <div class="emoji-burst">🎉</div>
+            <div style="font-size: 48px; margin-bottom: 16px; color: var(--accent);">✅</div>
+            
+            <h1 class="mb-2">Redeemed!</h1>
+            <p class="text-secondary mb-6">The voucher has been successfully marked as used.</p>
+            
+            <div style="background: #F3F4F6; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+                <p class="text-sm text-secondary mb-1">Apply Discount / Reward</p>
+                <p class="font-semibold" style="font-size: 20px;" id="success-reward">₹50 Off</p>
+                <p class="text-sm mt-2" id="success-customer"></p>
+            </div>
+            
+            <button id="success-scan-btn" class="btn btn-primary">Scan Another Voucher</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- MOCK DATABASE ---
+    const partners = {
+        'gazebo': { id: 'gazebo', name: 'Gazebo', icon: '🍔', pass: 'gazebo123' },
+        'northsquare': { id: 'northsquare', name: 'North Square', icon: '🍕', pass: 'nsq123' },
+        'hunger': { id: 'hunger', name: 'Hunger', icon: '🥗', pass: 'hunger123' },
+        'gymkhana': { id: 'gymkhana', name: 'Gymkhana', icon: '🏋️', pass: 'gym123' },
+        'ab3': { id: 'ab3', name: 'AB3 Canteen', icon: '🍱', pass: 'ab3123' },
+        'library': { id: 'library', name: 'Library', icon: '📚', pass: 'lib123' },
+        'demo': { id: 'demo', name: 'Demo Partner', icon: '🏪', pass: 'demo' }
+    };
+
+    const vouchers = {
+        'GZB-20-A4B7': { code: 'GZB-20-A4B7', partnerId: 'gazebo', reward: '₹20 Off', customer: 'Priya Sharma', status: 'active', expires: '2026-10-05', coins: 50 },
+        'NSQ-50-X9K2': { code: 'NSQ-50-X9K2', partnerId: 'northsquare', reward: '₹50 Off', customer: 'Arjun Mehta', status: 'active', expires: '2026-10-12', coins: 120 },
+        'GYM-1D-P3Q8': { code: 'GYM-1D-P3Q8', partnerId: 'gymkhana', reward: '1-Day Pass', customer: 'Sneha Patel', status: 'used', expires: '2026-09-15', coins: 150 },
+        'HGR-50-M7W1': { code: 'HGR-50-M7W1', partnerId: 'hunger', reward: '₹50 Off', customer: 'Rahul Gupta', status: 'active', expires: '2026-10-20', coins: 120 },
+        'AB3-20-Z2N5': { code: 'AB3-20-Z2N5', partnerId: 'ab3', reward: '₹20 Off', customer: 'Divya Nair', status: 'expired', expires: '2026-08-01', coins: 50 },
+        'LIB-FN-Q1R4': { code: 'LIB-FN-Q1R4', partnerId: 'library', reward: 'Fine Waiver', customer: 'Varun Kumar', status: 'active', expires: '2026-10-30', coins: 100 }
+    };
+
+    // --- STATE ---
+    let currentPartner = null;
+    let currentVoucher = null;
+
+    // --- DOM ELEMENTS ---
+    const screens = {
+        login: document.getElementById('screen-login'),
+        scanner: document.getElementById('screen-scanner'),
+        result: document.getElementById('screen-result'),
+        success: document.getElementById('screen-success')
+    };
+
+    // Login Elements
+    const partnerSelect = document.getElementById('partner-select');
+    const passwordInput = document.getElementById('password-input');
+    const loginBtn = document.getElementById('login-btn');
+    const loginError = document.getElementById('login-error');
+
+    // Scanner Elements
+    const scannerPartnerName = document.getElementById('scanner-partner-name');
+    const logoutBtn = document.getElementById('logout-btn');
+    const voucherInput = document.getElementById('voucher-input');
+    const verifyBtn = document.getElementById('verify-btn');
+    const verifyBtnText = verifyBtn.querySelector('.btn-text');
+    const verifyLoader = document.getElementById('verify-loader');
+    const testCodesContainer = document.getElementById('test-codes-container');
+
+    // Result Elements
+    const resultBackBtn = document.getElementById('result-back-btn');
+    const resultBanner = document.getElementById('result-banner');
+    const resultIcon = document.getElementById('result-icon');
+    const resultPartner = document.getElementById('result-partner');
+    const resultReward = document.getElementById('result-reward');
+    const resultCustomer = document.getElementById('result-customer');
+    const resultCode = document.getElementById('result-code');
+    const resultCoins = document.getElementById('result-coins');
+    const resultExpires = document.getElementById('result-expires');
+    const actionContainer = document.getElementById('action-container');
+    const redeemBtn = document.getElementById('redeem-btn');
+    const scanAnotherBtn = document.getElementById('scan-another-btn');
+
+    // Success Elements
+    const successReward = document.getElementById('success-reward');
+    const successCustomer = document.getElementById('success-customer');
+    const successScanBtn = document.getElementById('success-scan-btn');
+
+    // --- FUNCTIONS ---
+    function showScreen(screenName) {
+        Object.values(screens).forEach(s => s.classList.remove('active'));
+        screens[screenName].classList.add('active');
+        window.scrollTo(0, 0);
+    }
+
+    function initTestCodes() {
+        testCodesContainer.innerHTML = '';
+        Object.keys(vouchers).forEach(code => {
+            const span = document.createElement('span');
+            span.className = 'test-code';
+            span.textContent = code;
+            span.onclick = () => {
+                voucherInput.value = code;
+            };
+            testCodesContainer.appendChild(span);
+        });
+    }
+
+    // --- EVENT LISTENERS ---
+    
+    // Login
+    loginBtn.addEventListener('click', () => {
+        const partnerId = partnerSelect.value;
+        const pass = passwordInput.value;
+        
+        loginError.style.display = 'none';
+        
+        if (!partnerId || !partners[partnerId]) {
+            loginError.textContent = 'Please select an outlet.';
+            loginError.style.display = 'block';
+            return;
+        }
+
+        const p = partners[partnerId];
+        if (pass === p.pass || (partnerId === 'demo' && pass === 'demo')) {
+            currentPartner = p;
+            scannerPartnerName.innerHTML = `${p.icon} ${p.name}`;
+            voucherInput.value = '';
+            showScreen('scanner');
+        } else {
+            loginError.textContent = 'Invalid password.';
+            loginError.style.display = 'block';
+        }
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', () => {
+        currentPartner = null;
+        passwordInput.value = '';
+        partnerSelect.value = '';
+        showScreen('login');
+    });
+
+    // Auto-format input
+    voucherInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+    });
+
+    // Verify
+    verifyBtn.addEventListener('click', () => {
+        const code = voucherInput.value.trim();
+        if (!code) return;
+
+        // UI Loading State
+        verifyBtn.disabled = true;
+        verifyBtnText.style.display = 'none';
+        verifyLoader.classList.add('active');
+
+        setTimeout(() => {
+            verifyBtn.disabled = false;
+            verifyBtnText.style.display = 'inline';
+            verifyLoader.classList.remove('active');
+
+            const v = vouchers[code];
+            if (!v) {
+                alert(`Voucher ${code} not found in database.`);
+                return;
+            }
+            
+            // Allow any partner to scan for demo purposes, 
+            // but in real app we might check if v.partnerId == currentPartner.id
+            if (currentPartner.id !== 'demo' && v.partnerId !== currentPartner.id) {
+                alert(`Warning: This voucher is for ${partners[v.partnerId].name}, not ${currentPartner.name}.`);
+                // Let it proceed for demo sake
+            }
+
+            currentVoucher = v;
+            renderResultScreen(v);
+            showScreen('result');
+
+        }, 1000);
+    });
+
+    // Render Result
+    function renderResultScreen(v) {
+        const p = partners[v.partnerId];
+        resultIcon.textContent = p.icon;
+        resultPartner.textContent = p.name;
+        resultReward.textContent = v.reward;
+        resultCustomer.textContent = v.customer;
+        resultCode.textContent = v.code;
+        resultCoins.textContent = v.coins + ' coins';
+        resultExpires.textContent = v.expires;
+
+        // Reset
+        resultBanner.className = 'voucher-status';
+        actionContainer.style.display = 'none';
+
+        if (v.status === 'active') {
+            resultBanner.classList.add('status-active');
+            resultBanner.innerHTML = '✅ Valid &mdash; Ready to Redeem';
+            actionContainer.style.display = 'block';
+        } else if (v.status === 'used') {
+            resultBanner.classList.add('status-used');
+            resultBanner.innerHTML = '⛔ Already Used';
+        } else {
+            resultBanner.classList.add('status-expired');
+            resultBanner.innerHTML = '❌ Expired';
+        }
+    }
+
+    // Back to Scanner
+    resultBackBtn.addEventListener('click', () => {
+        voucherInput.value = '';
+        showScreen('scanner');
+    });
+
+    scanAnotherBtn.addEventListener('click', () => {
+        voucherInput.value = '';
+        showScreen('scanner');
+    });
+
+    // Redeem
+    redeemBtn.addEventListener('click', () => {
+        if (!currentVoucher || currentVoucher.status !== 'active') return;
+
+        // Mark DB as used
+        currentVoucher.status = 'used';
+
+        // Update success screen info
+        successReward.textContent = currentVoucher.reward;
+        successCustomer.textContent = `for ${currentVoucher.customer}`;
+
+        showScreen('success');
+    });
+
+    // Success -> Scanner
+    successScanBtn.addEventListener('click', () => {
+        voucherInput.value = '';
+        showScreen('scanner');
+    });
+
+    // Init
+    initTestCodes();
+
+</script>
+</body>
+</html>

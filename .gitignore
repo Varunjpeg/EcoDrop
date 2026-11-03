@@ -1,0 +1,46 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist.tar.gz
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# ── Node / React ──────────────────────────────────────────────────────────────
+node_modules/
+mobile/dist/
+.npm
+.pnpm-store/
+
+# ── Environment / Secrets (NEVER commit these) ────────────────────────────────
+.env
+.env.local
+.env.*.local
+mobile/.env
+mobile/.env.local
+
+# ── AI Model weights (too large for git — use Git LFS or link separately) ────
+*.pt
+*.onnx
+*.torchscript
+best.pt
+
+# ── Misc build/temp ───────────────────────────────────────────────────────────
+pi/dist/
+pi/dist.tar.gz
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ── Dataset images (large) ────────────────────────────────────────────────────
+pi/datasets/ecodrop_v2/images/
+pi/datasets/ecodrop_v2/labels/

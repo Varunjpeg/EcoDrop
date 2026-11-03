@@ -1,0 +1,23 @@
+# ═══════════════════════════════════════════════════════════════════
+# EcoDrop-CA v2 — Custom YOLOv11 Dataset Config
+# 7 Classes for Campus Recycling Machine
+# ═══════════════════════════════════════════════════════════════════
+
+path: ./datasets/ecodrop_v2   # relative to train script location
+
+train: images/train
+val:   images/val
+test:  images/test   # optional
+
+# Number of classes
+nc: 7
+
+# Class names (must match EcoDrop ITEM_CLASSES keys)
+names:
+  0: pen             # Pen / Marker
+  1: book            # Textbook / Book
+  2: cardboard       # Cardboard Box
+  3: wire_cable      # Adapter / Cable / Charger
+  4: plastic_bottle  # Plastic Bottle
+  5: mouse           # Computer Mouse
+  6: mobile_phone    # Mobile Phone
