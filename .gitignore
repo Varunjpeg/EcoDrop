@@ -25,11 +25,12 @@ mobile/dist/
 mobile/.env
 mobile/.env.local
 
-# ── AI Model weights (too large for git — use Git LFS or link separately) ────
-*.pt
+# ── AI Model weights ──────────────────────────────────────────────────────────
+# Root best.pt (duplicate/old) — excluded
+/best.pt
 *.onnx
 *.torchscript
-best.pt
+# pi/models/ecodrop_yolov11.pt IS included (18MB < GitHub's 100MB limit)
 
 # ── Misc build/temp ───────────────────────────────────────────────────────────
 pi/dist/
